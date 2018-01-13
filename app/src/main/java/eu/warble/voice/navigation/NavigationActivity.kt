@@ -21,14 +21,4 @@ class NavigationActivity : AppCompatActivity() {
 
         navigationPresenter = NavigationPresenter(Injection.provideVoiceRepository(), navigationFragment)
     }
-
-    override fun onResume() {
-        super.onResume()
-        navigationPresenter.resume()
-    }
-
-    override fun onPause() {
-        navigationPresenter.pause()
-        super.onPause()
-    }
 }

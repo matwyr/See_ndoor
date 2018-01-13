@@ -1,12 +1,14 @@
 package eu.warble.voice.navigation
 
 import com.indoorway.android.common.sdk.listeners.generic.Action1
+import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayMap
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkState
+import eu.warble.voice.util.aStarSearch.AStarSearch
 
 object NavigationService {
 
@@ -27,7 +29,12 @@ object NavigationService {
 
     private fun onMapLoaded(indoorwayMap: IndoorwayMap) {
         this.paths = indoorwayMap.paths
-
+        var search = AStarSearch(paths)
+        val nodes = search.findPath(
+                findClosestNode(latestPosition()?.coordinates),
+                paths.last()
+        )
+        println(nodes)
     }
 
     fun isStarted() = latestPosition() != null
@@ -47,6 +54,22 @@ object NavigationService {
         IndoorwayLocationSdk.instance().position().onChange().unregister(positionChangeListener)
         IndoorwayLocationSdk.instance().state().onError().unregister(stateErrorListener)
         IndoorwayLocationSdk.instance().state().onChange().unregister(onStateChangeListener)
+    }
+
+    fun findClosestNode(coordinates: Coordinates?): IndoorwayNode{
+        if (coordinates == null)
+            return paths.first()
+
+        var minDistance = Double.MAX_VALUE
+        var closestNode: IndoorwayNode = paths.first()
+        paths.forEach {
+            val distance = it.coordinates.getDistanceTo(coordinates)
+            if (distance < minDistance) {
+                minDistance = distance
+                closestNode = it
+            }
+        }
+        return closestNode
     }
 
     fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()

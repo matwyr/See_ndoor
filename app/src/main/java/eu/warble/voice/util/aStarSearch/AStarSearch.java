@@ -13,6 +13,10 @@ public class AStarSearch {
 
     List<IndoorwayNode> nodeList;
 
+    public AStarSearch(List<IndoorwayNode> nodeList){
+        this.nodeList = nodeList;
+    }
+
     public final List<IndoorwayNode> findPath(IndoorwayNode startNode, IndoorwayNode endNode) {
 
         AStarNodeWrapper startWrapper = new AStarNodeWrapper(startNode);
@@ -27,7 +31,7 @@ public class AStarSearch {
             closedList.add(current); // add current node to closed list
             openList.remove(current); // delete current node from open list
 
-            if ((current.getIndoorwayNode().equals(endNode))) { // found goal
+            if (current.getIndoorwayNode().equals(endNode)) { // found goal
                 return calcPath(startWrapper, current);
             }
 

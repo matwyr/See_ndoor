@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.indoorway.android.common.sdk.listeners.generic.Action0
 import com.indoorway.android.common.sdk.listeners.generic.Action1
 import com.indoorway.android.common.sdk.model.IndoorwayMap
@@ -18,7 +19,6 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
         layout = view
-
         return view
     }
 
@@ -42,15 +42,25 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     }
 
     override fun showLoading(show: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        loading_screen.visibility = if(show) View.VISIBLE else View.GONE
     }
 
     override fun showMap(show: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mapView.visibility = if(show) View.VISIBLE else View.GONE
     }
 
     override fun showError(error: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onResume() {
+        presenter.resume()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        presenter.pause()
+        super.onPause()
     }
 
     companion object {
