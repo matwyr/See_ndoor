@@ -45,7 +45,7 @@ class NavigationPresenter(val voiceRepository: VoiceRepository, val navigationVi
 
     }
 
-    override fun navigate(from: IndoorwayNode, to: IndoorwayNode) {
+    override fun navigate(to: String) {
 
     }
 

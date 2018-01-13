@@ -6,14 +6,19 @@
     android:layout_height="match_parent"
     tools:context="eu.warble.voice.navigation.NavigationActivity">
 
-    <include
-        android:id="loading_screen"
-        layout="@layout/loading_screen"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="visible"/>
+    <FrameLayout
+        android:id="@+id/loading_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include
+            layout="@layout/loading_screen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="visible"/>
+    </FrameLayout>
+
 
     <com.indoorway.android.map.sdk.view.IndoorwayMapView
         android:id="@+id/mapView"

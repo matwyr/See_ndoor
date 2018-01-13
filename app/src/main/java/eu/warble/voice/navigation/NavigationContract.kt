@@ -20,7 +20,7 @@ interface NavigationContract {
         fun result(requestCode: Int, resultCode: Int)
         fun recordVoice()
         fun saySomething(toSay: String)
-        fun navigate(from: IndoorwayNode, to: IndoorwayNode)
+        fun navigate(to: String)
     }
 
 }
