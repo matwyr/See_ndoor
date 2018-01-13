@@ -1,16 +1,23 @@
 package eu.warble.voice.util
 
+import android.util.Log
+import android.util.Log.wtf
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import eu.warble.voice.data.model.Direction
 import eu.warble.voice.data.model.NodeInfo
 
 
+
+//                      ******        PathTranslator.translate(nodelist: List<IndoorwayNode>)           *******
 class PathTranslator {
 
     companion object Translator {
 
         fun translate(nodelist: List<IndoorwayNode>):HashMap<IndoorwayNode,NodeInfo> {
             val hmap= HashMap<IndoorwayNode,NodeInfo>()
+            try{
+
+
 
             var prevNode:IndoorwayNode
             var currentNode:IndoorwayNode
@@ -20,7 +27,7 @@ class PathTranslator {
             var currentAngle:Float
             var relativeAngle:Float
 
-            var milestoneDistance:Double = 0.toDouble()
+            var milestoneDistance = 0.toDouble()
             var prevDistance:Double
 
 
@@ -59,6 +66,8 @@ class PathTranslator {
 
                     milestoneNode=currentNode
 
+                    milestoneDistance=0.toDouble()
+
                 }
                 else if(relativeAngle>20&&relativeAngle<150){
 
@@ -67,6 +76,8 @@ class PathTranslator {
                     hmap.put(milestoneNode, NodeInfo(Direction.RIGHT, 0.toDouble()))
 
                     milestoneNode=currentNode
+
+                    milestoneDistance=0.toDouble()
 
                 }
 
@@ -79,6 +90,11 @@ class PathTranslator {
 
             //hmap.put()
 
+            } catch (e: Exception) {
+                error(e.printStackTrace())
+            }
+
+            Log.e("whatever",hmap.toString())
             return hmap
         }
     }
