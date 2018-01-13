@@ -8,6 +8,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         IndoorwaySdk.initContext(this)
-        IndoorwaySdk.configure("acdd0179-3ea5-421b-8035-e96009d61a77")
+        IndoorwaySdk.configure("a34e1447-c5d1-4c8e-b53d-33901f8b83ab")
     }
 }
