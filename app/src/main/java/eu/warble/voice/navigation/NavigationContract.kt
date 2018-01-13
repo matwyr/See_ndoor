@@ -13,4 +13,5 @@ interface NavigationContract {
     interface Presenter: BasePresenter {
 
     }
+
 }
