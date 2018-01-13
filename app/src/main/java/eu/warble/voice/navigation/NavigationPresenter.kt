@@ -52,7 +52,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     override fun parseVoice(said: String?) {
         if (said != null) {
             when(said){
-                "stop" -> NavigationService.stopNavigation()
+                "stop" -> stopNavigation()
                 "repeat" -> saySomething("Please repeat")
                 else -> {
                     val obj = Tools.checkObjectAvailable(said, NavigationService.mapObjects)
@@ -70,12 +70,17 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         printPathAtMap(path)
     }
 
+    private fun stopNavigation() {
+        navigationView.printPathAtMap(null)
+
+    }
+
     fun printPathAtMap(dots: List<IndoorwayNode>?){
         navigationView.printPathAtMap(dots)
     }
 
-    fun printCurrentPosition(dot: Coordinates){
-        navigationView.printCurrentPosition(dot)
+    fun printCurrentPosition(position: IndoorwayPosition){
+        navigationView.printCurrentPosition(position)
     }
 
     override fun result(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -122,7 +127,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
 
     private fun onPositionChange(it: IndoorwayPosition) {
         NavigationService.latestNonNullPosition = it
-        printCurrentPosition(it.coordinates)
+        printCurrentPosition(it)
     }
 
     override fun destroy() {

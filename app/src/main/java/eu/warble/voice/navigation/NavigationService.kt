@@ -64,9 +64,5 @@ object NavigationService {
         return closestNode
     }
 
-    fun stopNavigation() {
-        //TODO
-    }
-
     private fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
 }

@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.indoorway.android.common.sdk.listeners.generic.Action0
 import com.indoorway.android.common.sdk.listeners.generic.Action1
-import com.indoorway.android.common.sdk.model.Coordinates
-import com.indoorway.android.common.sdk.model.IndoorwayMap
-import com.indoorway.android.common.sdk.model.IndoorwayNode
-import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
+import com.indoorway.android.common.sdk.model.*
 import eu.warble.voice.BasePresenter
 import eu.warble.voice.BaseView
 
@@ -20,7 +17,7 @@ interface NavigationContract {
         fun showLoading(show: Boolean)
         fun showMap(show: Boolean)
         fun printPathAtMap(dots: List<IndoorwayNode>?)
-        fun printCurrentPosition(dot: Coordinates)
+        fun printCurrentPosition(position: IndoorwayPosition)
         fun loadMap(buildingUUID: String, mapUUID: String,
                     onMapLoadCompletedListener: Action1<IndoorwayMap>,
                     onMapLoadFailedListener: Action0)
