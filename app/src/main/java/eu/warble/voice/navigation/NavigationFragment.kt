@@ -20,11 +20,16 @@ import android.graphics.Color
 import android.net.Uri
 import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayNode
+import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableCircle
+import com.indoorway.android.map.sdk.view.drawable.layers.Layer
+import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer
 
 
 class NavigationFragment : Fragment(), NavigationContract.View {
     override lateinit var presenter: NavigationContract.Presenter
+    val pathLayer: MarkersLayer by lazy { mapView.marker.addLayer(9f) }
+    var lastPaths: List<IndoorwayNode>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
@@ -53,7 +58,9 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     }
 
     override fun printPathAtMap(dots: List<IndoorwayNode>?) {
-        val pathLayer = mapView.marker.addLayer(9f)
+        //remove previous path
+        lastPaths?.forEach { pathLayer.remove(it.id.toString()) }
+        //add new path
         dots?.forEach {
             pathLayer.add(
                     DrawableCircle(
@@ -66,21 +73,11 @@ class NavigationFragment : Fragment(), NavigationContract.View {
                     )
             )
         }
+        lastPaths = dots
     }
 
-    override fun printCurrentPosition(dot: Coordinates) {
-        val positionLayer = mapView.marker.addLayer(10f)
-        positionLayer.remove("currentPosition")
-        positionLayer.add(
-                DrawableCircle(
-                        "currentPosition",
-                        1f, // radius in meters, eg. 0.4f
-                        Color.BLUE,
-                        Color.WHITE,
-                        0.1f, // width of outline in meters, eg. 0.1f
-                        dot // coordinates of circle center point
-                )
-        )
+    override fun printCurrentPosition(position: IndoorwayPosition) {
+        mapView.position.setPosition(position, false)
     }
 
     override fun getMContext(): Context? {
