@@ -19,6 +19,6 @@ class NavigationActivity : AppCompatActivity() {
             replaceFragmentInActivity(it, R.id.contentFrame)
         }
 
-        navigationPresenter = NavigationPresenter(Injection.provideVoiceRepository(), navigationFragment)
+        navigationPresenter = NavigationPresenter(navigationFragment)
     }
 }

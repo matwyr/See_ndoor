@@ -1,10 +1,7 @@
 package eu.warble.voice.navigation
 
 import com.indoorway.android.common.sdk.listeners.generic.Action1
-import com.indoorway.android.common.sdk.model.Coordinates
-import com.indoorway.android.common.sdk.model.IndoorwayMap
-import com.indoorway.android.common.sdk.model.IndoorwayNode
-import com.indoorway.android.common.sdk.model.IndoorwayPosition
+import com.indoorway.android.common.sdk.model.*
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkState
@@ -15,7 +12,8 @@ object NavigationService {
     private lateinit var positionChangeListener: Action1<IndoorwayPosition>
     private lateinit var stateErrorListener: Action1<IndoorwayLocationSdkError>
     private lateinit var onStartListener: Action1<IndoorwayPosition?>
-    private lateinit var paths: List<IndoorwayNode>
+    lateinit var paths: List<IndoorwayNode>
+    lateinit var mapObjects: List<IndoorwayObjectParameters>
 
     val onMapLoadCompletedListener: Action1<IndoorwayMap> by lazy { Action1<IndoorwayMap> { onMapLoaded(it) } }
 
@@ -29,12 +27,7 @@ object NavigationService {
 
     private fun onMapLoaded(indoorwayMap: IndoorwayMap) {
         this.paths = indoorwayMap.paths
-        var search = AStarSearch(paths)
-        val nodes = search.findPath(
-                findClosestNode(latestPosition()?.coordinates),
-                paths.last()
-        )
-        println(nodes)
+        this.mapObjects = indoorwayMap.objects
     }
 
     fun isStarted() = latestPosition() != null
@@ -70,6 +63,14 @@ object NavigationService {
             }
         }
         return closestNode
+    }
+
+    fun startNavigation(){
+        //TODO
+    }
+
+    fun stopNavigation() {
+        //TODO
     }
 
     fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
