@@ -5,13 +5,13 @@ import com.indoorway.android.common.sdk.model.*
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkState
-import eu.warble.voice.util.aStarSearch.AStarSearch
+import eu.warble.voice.util.AStarSearch
 
 object NavigationService {
-
     private lateinit var positionChangeListener: Action1<IndoorwayPosition>
     private lateinit var stateErrorListener: Action1<IndoorwayLocationSdkError>
     private lateinit var onStartListener: Action1<IndoorwayPosition?>
+    lateinit var latestNonNullPosition: IndoorwayPosition
     lateinit var paths: List<IndoorwayNode>
     lateinit var mapObjects: List<IndoorwayObjectParameters>
 
@@ -30,14 +30,16 @@ object NavigationService {
         this.mapObjects = indoorwayMap.objects
     }
 
-    fun isStarted() = latestPosition() != null
+    fun findPath(to: IndoorwayObjectParameters): List<IndoorwayNode> {
+        return AStarSearch(paths).findPath (
+                findClosestNode(latestNonNullPosition.coordinates), findClosestNode(to.centerPoint))
+    }
 
-    fun start(positionChangeListener: Action1<IndoorwayPosition>,
-              stateErrorListener: Action1<IndoorwayLocationSdkError>,
+    fun start(positionChangeListener: Action1<IndoorwayPosition> ,stateErrorListener: Action1<IndoorwayLocationSdkError>,
               onStartListener: Action1<IndoorwayPosition?>) {
-        this.positionChangeListener = positionChangeListener
         this.stateErrorListener = stateErrorListener
         this.onStartListener = onStartListener
+        this.positionChangeListener = positionChangeListener
         IndoorwayLocationSdk.instance().position().onChange().register(positionChangeListener)
         IndoorwayLocationSdk.instance().state().onError().register(stateErrorListener)
         IndoorwayLocationSdk.instance().state().onChange().register(onStateChangeListener)
@@ -49,10 +51,7 @@ object NavigationService {
         IndoorwayLocationSdk.instance().state().onChange().unregister(onStateChangeListener)
     }
 
-    fun findClosestNode(coordinates: Coordinates?): IndoorwayNode{
-        if (coordinates == null)
-            return paths.first()
-
+    private fun findClosestNode(coordinates: Coordinates): IndoorwayNode {
         var minDistance = Double.MAX_VALUE
         var closestNode: IndoorwayNode = paths.first()
         paths.forEach {
@@ -65,13 +64,9 @@ object NavigationService {
         return closestNode
     }
 
-    fun startNavigation(){
-        //TODO
-    }
-
     fun stopNavigation() {
         //TODO
     }
 
-    fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
+    private fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
 }

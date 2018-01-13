@@ -16,16 +16,18 @@ import eu.warble.voice.R
 import kotlinx.android.synthetic.main.navigation_fragment.*
 import java.util.*
 import android.content.ActivityNotFoundException
+import android.graphics.Color
 import android.net.Uri
+import com.indoorway.android.common.sdk.model.Coordinates
+import com.indoorway.android.common.sdk.model.IndoorwayNode
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawableCircle
 
 
 class NavigationFragment : Fragment(), NavigationContract.View {
     override lateinit var presenter: NavigationContract.Presenter
 
-    private lateinit var layout: View
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
-        layout = view
         return view
     }
 
@@ -39,13 +41,46 @@ class NavigationFragment : Fragment(), NavigationContract.View {
 
     override fun activateLongClickListener(activate: Boolean) {
         if (activate) {
-            layout.setOnLongClickListener {
+            clickScreen.bringToFront()
+            clickScreen.setOnLongClickListener {
                 presenter.recordVoice()
                 return@setOnLongClickListener true
             }
         }else {
-            layout.setOnLongClickListener(null)
+            mapView.bringToFront()
+            clickScreen.setOnLongClickListener(null)
         }
+    }
+
+    override fun printPathAtMap(dots: List<IndoorwayNode>?) {
+        val pathLayer = mapView.marker.addLayer(9f)
+        dots?.forEach {
+            pathLayer.add(
+                    DrawableCircle(
+                            it.id.toString(),
+                            0.4f, // radius in meters, eg. 0.4f
+                            Color.RED, // circle background color, eg. Color.RED
+                            Color.BLUE, // color of outline, eg. Color.BLUE
+                            0.1f, // width of outline in meters, eg. 0.1f
+                            it.coordinates // coordinates of circle center point
+                    )
+            )
+        }
+    }
+
+    override fun printCurrentPosition(dot: Coordinates) {
+        val positionLayer = mapView.marker.addLayer(10f)
+        positionLayer.remove("currentPosition")
+        positionLayer.add(
+                DrawableCircle(
+                        "currentPosition",
+                        1f, // radius in meters, eg. 0.4f
+                        Color.BLUE,
+                        Color.WHITE,
+                        0.1f, // width of outline in meters, eg. 0.1f
+                        dot // coordinates of circle center point
+                )
+        )
     }
 
     override fun getMContext(): Context? {
@@ -87,6 +122,7 @@ class NavigationFragment : Fragment(), NavigationContract.View {
 
     override fun onResume() {
         super.onResume()
+        presenter.start()
         presenter.resume()
     }
 

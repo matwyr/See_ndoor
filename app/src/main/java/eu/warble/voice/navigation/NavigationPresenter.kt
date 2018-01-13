@@ -9,20 +9,18 @@ import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
+import com.indoorway.android.common.sdk.model.Coordinates
+import com.indoorway.android.common.sdk.model.IndoorwayNode
+import eu.warble.voice.util.AStarSearch
 import eu.warble.voice.util.Tools
 import java.util.*
-import android.support.v4.content.ContextCompat.startActivity
-import android.content.ActivityNotFoundException
-import android.net.Uri
-import android.support.v4.app.ActivityCompat.startActivityForResult
-import eu.warble.voice.R
-import eu.warble.voice.navigation.NavigationFragment.Companion.REQ_CODE_SPEECH_INPUT
 
 
 class NavigationPresenter(val navigationView: NavigationContract.View)
     : NavigationContract.Presenter {
 
     lateinit var textToSpeech: TextToSpeech
+    private var mapIsLoaded: Boolean = false
 
     init {
         navigationView.presenter = this
@@ -48,12 +46,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     }
 
     override fun saySomething(toSay: String) {
-        textToSpeech.speak(toSay, TextToSpeech.QUEUE_FLUSH, null, null)
-    }
-
-    override fun navigate(to: IndoorwayObjectParameters) {
-        //val pathRepo = Injection.providePathRepository
-        //val path = pathRepo.findPath(to)
+        textToSpeech.speak(toSay, TextToSpeech.QUEUE_ADD, null, null)
     }
 
     override fun parseVoice(said: String?) {
@@ -72,17 +65,25 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         }
     }
 
-    private fun onPositionChange(it: IndoorwayPosition) {
+    private fun navigate(obj: IndoorwayObjectParameters) {
+        val path = NavigationService.findPath(obj)
+        printPathAtMap(path)
+    }
 
+    fun printPathAtMap(dots: List<IndoorwayNode>?){
+        navigationView.printPathAtMap(dots)
+    }
+
+    fun printCurrentPosition(dot: Coordinates){
+        navigationView.printCurrentPosition(dot)
     }
 
     override fun result(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == NavigationFragment.REQ_CODE_SPEECH_INPUT && resultCode == RESULT_OK && data != null){
-            //return what user said
             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             saySomething(result[0])
-            //todo use this command to do following commands
-            val command = Tools.recogniseRoom(result[0])
+            val command = Tools.recogniseCommand(result[0])
+            parseVoice(command)
         }
     }
 
@@ -93,6 +94,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                     navigationView.activateLongClickListener(true)
                     navigationView.showLoading(false)
                     navigationView.showMap(true)
+                    mapIsLoaded = true
                     saySomething("If you want to find room, press the screen and just say go, and room number")
                 }, onMapLoadFailedListener = Action0 {
                     navigationView.showError("MapLoadFailed")
@@ -105,25 +107,27 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     }
 
     override fun resume() {
-
         NavigationService.start(
-                positionChangeListener = Action1 {onPositionChange(it)},
+                positionChangeListener = Action1 { onPositionChange(it) } ,
                 stateErrorListener = Action1 {onStateError(it)},
                 onStartListener = Action1 { onLocationDetermined(it) }
         )
     }
 
     private fun onLocationDetermined(position: IndoorwayPosition?){
-        if (position != null){
-            loadMapView(position.buildingUuid, position.mapUuid)
-        }else
-            navigationView.showError("Indoorway error -> latest position is null," +
-                    " but STATE = LOCATING_FOREGROUND")
+        if (!mapIsLoaded)
+            loadMapView(NavigationService.latestNonNullPosition.buildingUuid,
+                        NavigationService.latestNonNullPosition.mapUuid)
+    }
+
+    private fun onPositionChange(it: IndoorwayPosition) {
+        NavigationService.latestNonNullPosition = it
+        printCurrentPosition(it.coordinates)
     }
 
     override fun destroy() {
-        textToSpeech.stop();
-        textToSpeech.shutdown();
+        textToSpeech.stop()
+        textToSpeech.shutdown()
     }
 
     private fun onStateError(error: IndoorwayLocationSdkError) {

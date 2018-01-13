@@ -19,6 +19,8 @@ interface NavigationContract {
         fun mString(resId: Int): String
         fun showLoading(show: Boolean)
         fun showMap(show: Boolean)
+        fun printPathAtMap(dots: List<IndoorwayNode>?)
+        fun printCurrentPosition(dot: Coordinates)
         fun loadMap(buildingUUID: String, mapUUID: String,
                     onMapLoadCompletedListener: Action1<IndoorwayMap>,
                     onMapLoadFailedListener: Action0)
@@ -33,7 +35,6 @@ interface NavigationContract {
         fun result(requestCode: Int, resultCode: Int, data: Intent?)
         fun recordVoice()
         fun saySomething(toSay: String)
-        fun navigate(to: IndoorwayObjectParameters)
         fun parseVoice(said: String?)
         fun destroy()
     }

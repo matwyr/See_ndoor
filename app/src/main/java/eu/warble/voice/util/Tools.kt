@@ -1,6 +1,7 @@
 package eu.warble.voice.util
 
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
+import java.util.*
 
 object Tools {
 
@@ -9,28 +10,30 @@ object Tools {
      * @param text input text from voice recognition
      * @return return the hall we want navigate to or a command
      */
-    fun recogniseRoom(text: String): String {
+    fun recogniseCommand(text: String): String {
         val speech: List<String> = text.split(" ")
-        for (i in speech.indices) {
-            if (speech[i] == "go") {
-                return if (i != speech.size - 1) {
-                    if (speech[i + 1] == "stop")
-                        "repeat"
-                    else
-                        speech[i + 1]
-                } else
-                    "repeat"
-            } else if (speech[i] == "stop") {
-                return "stop"
-            }
+        return when(speech.first()){
+            "go" -> text
+            "stop" -> "stop"
+            else -> "repeat"
         }
-        return "repeat"
+    }
+
+    private fun concatenate(from: Int, speech: List<String>): String {
+        var res: String = ""
+        for (i in speech.indices) {
+            if (i >= from)
+                res += speech[i]
+        }
+        return res
     }
 
     fun checkObjectAvailable(said: String, objList: List<IndoorwayObjectParameters>): IndoorwayObjectParameters? {
         var res: IndoorwayObjectParameters? = null
+        val saidL = said.toLowerCase()
         objList.forEach {
-            if (said == it.name)
+            val name = it.name as String
+            if (saidL.contains(name.toLowerCase()))
                 res = it
         }
         return res

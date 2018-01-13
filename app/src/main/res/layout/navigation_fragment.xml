@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context="eu.warble.voice.navigation.NavigationActivity">
 
+    <LinearLayout
+        android:id="@+id/clickScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:focusableInTouchMode="true"
+        android:clickable="true"
+        android:focusable="true" />
+
     <FrameLayout
         android:id="@+id/loading_screen"
         android:layout_width="match_parent"
@@ -17,6 +31,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:visibility="visible"/>
+
     </FrameLayout>
 
 
@@ -28,6 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        android:visibility="gone">
+    </com.indoorway.android.map.sdk.view.IndoorwayMapView>
 
 </android.support.constraint.ConstraintLayout>
