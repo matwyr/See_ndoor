@@ -62,7 +62,7 @@ class PathTranslator {
 
                     milestoneDistance += prevDistance
 
-                    hmap.put(milestoneNode, NodeInfo(Direction.LEFT, 0.toDouble()))
+                    hmap.put(milestoneNode, NodeInfo(Direction.LEFT, milestoneDistance))
 
                     milestoneNode=currentNode
 
@@ -73,7 +73,7 @@ class PathTranslator {
 
                     milestoneDistance += prevDistance
 
-                    hmap.put(milestoneNode, NodeInfo(Direction.RIGHT, 0.toDouble()))
+                    hmap.put(milestoneNode, NodeInfo(Direction.RIGHT, milestoneDistance))
 
                     milestoneNode=currentNode
 
@@ -94,7 +94,16 @@ class PathTranslator {
                 error(e.printStackTrace())
             }
 
-            Log.e("whatever",hmap.toString())
+
+
+            var ret=""
+
+            for ((key, value) in hmap) {
+                ret+="$value"+"\n"
+            }
+
+            Log.e("whatever",ret)
+
             return hmap
         }
     }
