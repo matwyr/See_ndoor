@@ -5,35 +5,33 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.indoorway.android.common.sdk.listeners.generic.Action0
-import com.indoorway.android.common.sdk.listeners.generic.Action1
-import com.indoorway.android.common.sdk.model.IndoorwayPosition
-import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import eu.warble.voice.R
-import kotlinx.android.synthetic.main.navigation_fragment.*
 
 class NavigationFragment : Fragment(), NavigationContract.View {
-
     override lateinit var presenter: NavigationContract.Presenter
-    private val positionChangeListener: Action1<IndoorwayPosition> by lazy {
-        Action1<IndoorwayPosition> { onPositionChange(it) }
-    }
-
-    private val stateErrorListener: Action1<IndoorwayLocationSdkError> by lazy {
-        Action1<IndoorwayLocationSdkError> { onStateError(it) }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
 
+        view.setOnLongClickListener {
+            presenter.recordVoice()
+            return@setOnLongClickListener true
+        }
+
         return view
     }
 
-    private fun onPositionChange(it: IndoorwayPosition) {
-
+    override fun showLoading(show: Boolean) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun onStateError(it: IndoorwayLocationSdkError) {}
+    override fun showMap(show: Boolean) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun showError(error: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     companion object {
         fun newInstance() = NavigationFragment()
