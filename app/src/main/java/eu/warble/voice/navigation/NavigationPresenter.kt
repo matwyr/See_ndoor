@@ -19,7 +19,7 @@ import eu.warble.voice.util.Tools
 class NavigationPresenter(val navigationView: NavigationContract.View)
     : NavigationContract.Presenter {
     private var mapIsLoaded: Boolean = false
-    
+
     companion object {
         val REQUEST_PERMISSION_CODE: Int = 234
     }
@@ -199,8 +199,8 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                 val permission = error.permission
                 navigationView.requestPermissions(permission, REQUEST_PERMISSION_CODE)
             }
-            IndoorwayLocationSdkError.BluetoothDisabled -> { navigationView.showError("Bluetooth is disabled") }
-            IndoorwayLocationSdkError.LocationDisabled -> { navigationView.showError("Location is disabled") }
+            IndoorwayLocationSdkError.BluetoothDisabled -> { VoiceService.speak(getString(R.string.enable_bluetooth)) }
+            IndoorwayLocationSdkError.LocationDisabled -> { VoiceService.speak(getString(R.string.enable_location)) }
             IndoorwayLocationSdkError.UnableToFetchData -> { navigationView.showError("Network-related error, service will be restarted on network connection established") }
             IndoorwayLocationSdkError.NoRadioMaps -> { navigationView.showError("Measurements have to be taken in order to use location") }
         }

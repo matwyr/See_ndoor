@@ -12,4 +12,6 @@
     <string name="person_currently_not_available">Person currently not available</string>
     <string name="person_last_seen_on">Person last seen on</string>
     <string name="your_device_is_not_supported">Sorry your device is not supported</string>
+    <string name="enable_bluetooth">Please enable bluetooth</string>
+    <string name="enable_location">Please enable location</string>
 </resources>
