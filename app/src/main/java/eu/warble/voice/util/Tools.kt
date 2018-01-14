@@ -14,6 +14,7 @@ object Tools {
         val speech: List<String> = text.split(" ")
         return when(speech.first()){
             "go" -> text
+            "find" -> text
             "stop" -> "stop"
             else -> "repeat"
         }

@@ -3,7 +3,6 @@ package eu.warble.voice.navigation
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import eu.warble.voice.R
-import eu.warble.voice.util.Injection
 import eu.warble.voice.util.replaceFragmentInActivity
 
 class NavigationActivity : AppCompatActivity() {

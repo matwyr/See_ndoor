@@ -29,7 +29,7 @@ interface NavigationContract {
         fun pause()
         fun resume()
         fun result(requestCode: Int, resultCode: Int, data: Intent?)
-        fun parseVoiceCommand(said: String?)
+        fun doVoiceCommand(command: String?)
         fun destroy()
         fun recordVoice()
     }

@@ -47,17 +47,21 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         })
     }
 
-    override fun parseVoiceCommand(said: String?) {
-        if (said != null) {
-            when(said){
+    override fun doVoiceCommand(command: String?) {
+        if (command != null) {
+            when(command){
                 "stop" -> stopNavigation()
                 "repeat" -> VoiceService.speak(getString(R.string.please_repeat))
                 else -> {
-                    val obj = Tools.checkObjectAvailable(said, NavigationService.mapObjects)
-                    if(obj != null)
-                        navigate(obj)
-                    else
-                        VoiceService.speak(getString(R.string.room_is_not_existing))
+                    if (command.startsWith("go")) {
+                        val obj = Tools.checkObjectAvailable(command, NavigationService.mapObjects)
+                        if (obj != null)
+                            navigate(obj)
+                        else
+                            VoiceService.speak(getString(R.string.room_is_not_existing))
+                    }else if (command.startsWith("find")){
+                        //TODO
+                    }
                 }
             }
         }
@@ -86,7 +90,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             VoiceService.speak(result[0])
             val command = Tools.recogniseCommand(result[0])
-            parseVoiceCommand(command)
+            doVoiceCommand(command)
         }
     }
 
