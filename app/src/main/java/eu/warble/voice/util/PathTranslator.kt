@@ -1,108 +1,91 @@
 package eu.warble.voice.util
 
 import android.util.Log
-import android.util.Log.wtf
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import eu.warble.voice.data.model.Direction
 import eu.warble.voice.data.model.NodeInfo
 
 
 
-//                      ******        PathTranslator.translate(nodelist: List<IndoorwayNode>)           *******
+//                      ******        PathTranslator.translate(nodelist)           *******
 class PathTranslator {
 
     companion object Translator {
 
-        fun translate(nodelist: List<IndoorwayNode>):HashMap<IndoorwayNode,NodeInfo> {
-            val hmap= HashMap<IndoorwayNode,NodeInfo>()
-            try{
+        fun translate(nodelist: List<IndoorwayNode>): LinkedHashMap<IndoorwayNode, NodeInfo> {
+            val hmap = LinkedHashMap<IndoorwayNode, NodeInfo>()
+            try {
+                var prevNode: IndoorwayNode
+                var currentNode: IndoorwayNode
+                var milestoneNode: IndoorwayNode
 
+                var prevAngle: Float
+                var currentAngle: Float
+                var relativeAngle: Float
 
+                var milestoneDistance = 0.toDouble()
+                var prevDistance: Double
 
-            var prevNode:IndoorwayNode
-            var currentNode:IndoorwayNode
-            var milestoneNode:IndoorwayNode
+                val iterator = nodelist.listIterator()
 
-            var prevAngle:Float
-            var currentAngle:Float
-            var relativeAngle:Float
+                prevNode = nodelist[0]
+                currentNode = nodelist[1]
+                prevAngle = prevNode.coordinates.getAngleTo(currentNode.coordinates)
 
-            var milestoneDistance = 0.toDouble()
-            var prevDistance:Double
+                milestoneNode = prevNode
 
+                var direction=Direction.STRAIGHT
 
-            //var dist = tnode.coordinates.getDistanceTo(tnode2.coordinates)
-            //var angle = tnode.coordinates.getAngleTo(tnode2.coordinates)
-            //var ninfo= NodeInfo(direction = Direction.STRAIGHT, distanceToNext = dist)
+                while (iterator.hasNext()) {
+                    currentNode = iterator.next()
 
+                    prevDistance = prevNode.coordinates.getDistanceTo(currentNode.coordinates)
+                    currentAngle = prevNode.coordinates.getAngleTo(currentNode.coordinates)
 
-            //fangle=fnode.coordinates.getAngleTo(snode.coordinates)
+                    relativeAngle = currentAngle - prevAngle
 
-            val literator=nodelist.listIterator()
-            prevNode=nodelist[0]
-            currentNode=nodelist[1]
-            prevAngle=prevNode.coordinates.getAngleTo(currentNode.coordinates)
-
-            milestoneNode=prevNode
-
-            while(literator.hasNext()){
-                currentNode=literator.next()
-
-                prevDistance=prevNode.coordinates.getDistanceTo(currentNode.coordinates)
-                currentAngle=prevNode.coordinates.getAngleTo(currentNode.coordinates)
-
-                relativeAngle=currentAngle-prevAngle
-
-                if(relativeAngle>-20&&relativeAngle<20){
+                    if (relativeAngle > -20 && relativeAngle < 20) {
 
                         milestoneDistance += prevDistance
 
+                    } else{
+                        if (relativeAngle > -150 && relativeAngle < -20) direction=Direction.LEFT
+                        else if (relativeAngle > 20 && relativeAngle < 150) direction=Direction.RIGHT
+
+                            milestoneDistance += prevDistance
+
+                            if (milestoneDistance > 2) {
+                                hmap.put(milestoneNode, NodeInfo(direction, milestoneDistance))
+                            }
+                            Log.e("whatever", relativeAngle.toString() + direction + milestoneDistance)
+
+                            milestoneNode = currentNode
+
+                            milestoneDistance = 0.toDouble()
+
+
+                    }
+
+                    prevNode = currentNode
+                    prevAngle = currentAngle
+
                 }
-                else if(relativeAngle>-150&&relativeAngle<-20){
 
-                    milestoneDistance += prevDistance
+                hmap.put(nodelist.last(), NodeInfo(Direction.FINISH, milestoneDistance))
 
-                    hmap.put(milestoneNode, NodeInfo(Direction.LEFT, milestoneDistance))
-
-                    milestoneNode=currentNode
-
-                    milestoneDistance=0.toDouble()
-
-                }
-                else if(relativeAngle>20&&relativeAngle<150){
-
-                    milestoneDistance += prevDistance
-
-                    hmap.put(milestoneNode, NodeInfo(Direction.RIGHT, milestoneDistance))
-
-                    milestoneNode=currentNode
-
-                    milestoneDistance=0.toDouble()
-
-                }
-
-                prevNode=currentNode
-                prevAngle=currentAngle
-
-            }
-
-
-
-            //hmap.put()
+                //hmap.put()
 
             } catch (e: Exception) {
                 error(e.printStackTrace())
             }
 
-
-
-            var ret=""
+            var ret = ""
 
             for ((key, value) in hmap) {
-                ret+="$value"+"\n"
+                ret += "$value" + "\n"
             }
 
-            Log.e("whatever",ret)
+            Log.e("whatever", ret)
 
             return hmap
         }
