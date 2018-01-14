@@ -25,17 +25,23 @@ import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableCircle
 import com.indoorway.android.map.sdk.view.drawable.layers.Layer
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer
+import kotlinx.android.synthetic.main.loading_screen.*
 
 
 class NavigationFragment : Fragment(), NavigationContract.View {
     override lateinit var presenter: NavigationContract.Presenter
 
-    val pathLayer: MarkersLayer by lazy { mapView.marker.addLayer(9f) }
+    private val pathLayer: MarkersLayer by lazy { mapView.marker.addLayer(9f) }
     var lastPaths: List<IndoorwayNode>? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
-        presenter.start()
         return view
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        presenter.start()
     }
 
     override fun loadMap(buildingUUID: String, mapUUID: String,

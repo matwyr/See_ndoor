@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="colorAccent">#FF5252</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#757575</color>
+    <color name="dividerColor">#bdbdbd</color>
+    <color name="secondaryBackground">#FAFAFA</color>
+
+    <!-- indoorway -->
+    <color name="indoorway_map_text_color">@color/primaryText</color>
+    <color name="indoorway_map_text_shadow">@color/secondaryText</color>
+    <color name="indoorway_map_outdoor_background">@color/colorPrimary</color>
+    <color name="indoorway_map_indoor_background">#bdbdbd</color>
+    <color name="indoorway_map_outline">#eeeeee</color>
+    <color name="indoorway_map_default_room_background">#e0e0e0</color>
+    <color name="indoorway_map_default_room_outline">#eeeeee</color>
+    <color name="indoorway_map_selected_room_background">@color/colorPrimary</color>
+    <color name="indoorway_map_selected_room_outline">#eeeeee</color>
+    <color name="indoorway_map_heading">@color/colorPrimary</color>
+    <color name="indoorway_map_position_dot_background">@color/colorPrimary</color>
+    <color name="indoorway_map_position_dot_outline">#eeeeee</color>
+    <color name="indoorway_map_position_uncertainty_background">#3c0091ea</color>
+    <color name="indoorway_map_position_uncertainty_outline">#eeeeee</color>
+    <color name="indoorway_map_navigation_dots">#000000</color>
+    <color name="indoorway_inaccessible_color">#e0e0e0</color>
 </resources>

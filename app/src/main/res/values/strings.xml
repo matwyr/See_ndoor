@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Voice</string>
-    <string name="loading">Loading</string>
     <string name="speech_prompt">Say something</string>
     <string name="determining_location">Determining location</string>
     <string name="error_language_not_supported">Language is not supported</string>

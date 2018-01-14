@@ -39,4 +39,5 @@ dependencies {
     implementation 'com.indoorway.android:map:2.0.4'
     implementation 'com.indoorway.android:location:2.0.4'
     implementation 'com.indoorway.android:fragments:2.0.4'
+    implementation 'com.wang.avi:library:2.1.3'
 }

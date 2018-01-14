@@ -20,8 +20,10 @@ object VoiceService {
                 val res = textToSpeech.setLanguage(Locale.US)
                 if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED)
                     voiceServiceCallback.onError(context.getString(R.string.error_language_not_supported))
-                voiceServiceCallback.onStarted()
-                isStarted = true
+                else {
+                    isStarted = true
+                    voiceServiceCallback.onStarted()
+                }
             }else
                 voiceServiceCallback.onError(context.getString(R.string.error_tts_init_failed))
         })
