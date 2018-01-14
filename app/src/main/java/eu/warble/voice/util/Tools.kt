@@ -1,5 +1,6 @@
 package eu.warble.voice.util
 
+import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
 import java.util.*
 
@@ -18,15 +19,6 @@ object Tools {
             "stop" -> "stop"
             else -> "repeat"
         }
-    }
-
-    private fun concatenate(from: Int, speech: List<String>): String {
-        var res: String = ""
-        for (i in speech.indices) {
-            if (i >= from)
-                res += speech[i]
-        }
-        return res
     }
 
     fun checkObjectAvailable(said: String, objList: List<IndoorwayObjectParameters>): IndoorwayObjectParameters? {

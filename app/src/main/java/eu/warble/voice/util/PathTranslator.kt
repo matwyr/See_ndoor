@@ -79,7 +79,7 @@ object PathTranslator {
 
             var ret = ""
 
-            for ((_, value) in hmap) {
+            for ((key, value) in hmap) {
                 ret += "$value" + "\n"
             }
 

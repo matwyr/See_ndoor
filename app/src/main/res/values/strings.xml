@@ -9,4 +9,6 @@
     <string name="room_is_not_existing">Room is not existing</string>
     <string name="init_tip">If you want to find room, press the screen and just say go, and room number</string>
     <string name="error_map_load_failed">Map load failed</string>
+    <string name="person_not_found">Person not found</string>
+    <string name="person_currently_not_available">Person currently not available</string>
 </resources>

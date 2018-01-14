@@ -8,13 +8,15 @@ import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
 import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import android.speech.RecognizerIntent
+import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import eu.warble.voice.R
+import eu.warble.voice.data.VisitorDataSource
 import eu.warble.voice.data.VoiceService
 import eu.warble.voice.data.model.Direction
+import eu.warble.voice.data.model.NodeInfo
 import eu.warble.voice.util.PathTranslator
 import eu.warble.voice.util.Tools
-import kotlin.concurrent.fixedRateTimer
 
 
 class NavigationPresenter(val navigationView: NavigationContract.View)
@@ -39,6 +41,10 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         }
     }
 
+    fun tmp (){
+
+    }
+
     /**
      * Result will be on result method
      */
@@ -59,32 +65,49 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                     if (command.startsWith("go")) {
                         val obj = Tools.checkObjectAvailable(command, NavigationService.mapObjects)
                         if (obj != null)
-                            startNavigating(obj)
+                            startNavigating(obj.centerPoint)
                         else
                             VoiceService.speak(getString(R.string.room_is_not_existing))
-                    }else if (command.startsWith("find")){
-                        //TODO
+                    }else if (command.startsWith("find ")){
+                        findVisitor(command)
                     }
                 }
             }
         }
     }
 
-    private fun startNavigating(obj: IndoorwayObjectParameters) {
-        val path = NavigationService.findPath(obj)
+    private fun findVisitor(command: String?){
+        val name = command?.substringAfter("find ")
+        if (name != null)
+            VisitorDataSource.findPerson(name, object : VisitorDataSource.OnPersonFindListener{
+                override fun found(position: IndoorwayPosition?) {
+                    if (position != null)
+                        startNavigating(position.coordinates)
+                    else
+                        VoiceService.speak(getString(R.string.person_currently_not_available))
+                }
+                override fun notFound() {
+                    VoiceService.speak(getString(R.string.person_not_found))
+                }
+            })
+    }
+
+    private fun startNavigating(coordinates: Coordinates) {
+        if (NavigationService.navIsRunning)
+            stopNavigation()
+        val path = NavigationService.findPath(coordinates)
         printPathAtMap(path)
         NavigationService.navigablePath = PathTranslator.translate(path)
         NavigationService.navIsRunning = true
         val node = NavigationService.navigablePath?.iterator()?.next()
-        if (node != null) {
+        if (node != null)
             VoiceService.speak(NavigationService.navigableNodeInfoToString(node.value))
-        }
     }
 
     private fun stopNavigation() {
         navigationView.printPathAtMap(null)
-        //TODO
-
+        NavigationService.navigablePath = null
+        NavigationService.navIsRunning = false
     }
 
     private fun printPathAtMap(dots: List<IndoorwayNode>?){
@@ -137,18 +160,20 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                         NavigationService.latestNonNullPosition.mapUuid)
     }
 
+    var latestSaid: MutableMap.MutableEntry<IndoorwayNode, NodeInfo>? = null
     private fun onPositionChange(it: IndoorwayPosition) {
         NavigationService.latestNonNullPosition = it
         printCurrentPosition(it)
-        if (NavigationService.navIsRunning && NavigationService.atNode(it)){
-            val node = NavigationService.navigablePath?.iterator()?.next()
-            if (node != null) {
-                VoiceService.speak(NavigationService.navigableAtNodeInfoToString(node.value))
-                NavigationService.navigablePath?.remove(node.key)
-                if (node.value.direction == Direction.FINISH) {
-                    stopNavigation()
-                }
+        val currentNode = NavigationService.getCurrentAtNode(it)
+        if (NavigationService.navIsRunning && currentNode != null && currentNode != latestSaid) {
+            if (currentNode.value.direction == Direction.FINISH) {
+                stopNavigation()
+                VoiceService.speak(NavigationService.navigableAtNodeInfoToString(currentNode.value))
+                return
             }
+            VoiceService.speak(NavigationService.navigableAtNodeInfoToString(currentNode.value))
+            VoiceService.speak(NavigationService.navigableNodeInfoToString(currentNode.value))
+            latestSaid = currentNode
         }
     }
 

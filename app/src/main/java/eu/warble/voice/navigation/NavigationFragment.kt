@@ -18,6 +18,7 @@ import java.util.*
 import android.content.ActivityNotFoundException
 import android.graphics.Color
 import android.net.Uri
+import android.view.HapticFeedbackConstants
 import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import com.indoorway.android.common.sdk.model.IndoorwayPosition
@@ -46,13 +47,16 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     }
 
     override fun activateLongClickListener(activate: Boolean) {
+        clickScreen.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         if (activate) {
+            clickScreen.isHapticFeedbackEnabled = true
             clickScreen.bringToFront()
             clickScreen.setOnLongClickListener {
                 presenter.recordVoice()
                 return@setOnLongClickListener true
             }
         }else {
+            clickScreen.isHapticFeedbackEnabled = true
             mapView.bringToFront()
             clickScreen.setOnLongClickListener(null)
         }

@@ -14,7 +14,7 @@ object NavigationService {
     private lateinit var stateErrorListener: Action1<IndoorwayLocationSdkError>
     private lateinit var onStartListener: Action1<IndoorwayPosition?>
     lateinit var latestNonNullPosition: IndoorwayPosition
-    lateinit var paths: List<IndoorwayNode>
+    private lateinit var paths: List<IndoorwayNode>
     lateinit var mapObjects: List<IndoorwayObjectParameters>
     var navigablePath: LinkedHashMap<IndoorwayNode, NodeInfo>? = null
     var navIsRunning: Boolean = false
@@ -34,9 +34,9 @@ object NavigationService {
         this.mapObjects = indoorwayMap.objects
     }
 
-    fun findPath(to: IndoorwayObjectParameters): List<IndoorwayNode> {
+    fun findPath(to: Coordinates): List<IndoorwayNode> {
         return AStarSearch(paths).findPath (
-                findClosestNode(latestNonNullPosition.coordinates), findClosestNode(to.centerPoint))
+                findClosestNode(latestNonNullPosition.coordinates), findClosestNode(to))
     }
 
     fun start(positionChangeListener: Action1<IndoorwayPosition> ,stateErrorListener: Action1<IndoorwayLocationSdkError>,
@@ -70,9 +70,9 @@ object NavigationService {
 
     fun navigableNodeInfoToString(nodeInfo: NodeInfo): String{
         return if (nodeInfo.direction != Direction.FINISH)
-            "In ${nodeInfo.distance.toInt()} metres turn ${nodeInfo.direction.name}"
+            "In ${(nodeInfo.distance * 1.1).toInt()} steps turn ${nodeInfo.direction.name}"
         else
-            "In ${nodeInfo.distance.toInt()} will be destination point"
+            "In ${(nodeInfo.distance * 1.1).toInt()} steps will be destination point"
     }
 
     fun navigableAtNodeInfoToString(nodeInfo: NodeInfo): String{
@@ -84,13 +84,19 @@ object NavigationService {
 
     private fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
 
-    fun atNode(it: IndoorwayPosition): Boolean {
-        val node = navigablePath?.iterator()?.next()
-        if (node != null){
-            if (it.coordinates.getDistanceTo(node.key.coordinates) <= 2){
-                return true
-            }
+    fun atNode(it: IndoorwayPosition, node: IndoorwayNode): Boolean {
+        if (it.coordinates.getDistanceTo(node.coordinates) <= 2){
+            return true
         }
         return false
+    }
+
+    fun getCurrentAtNode(indoorwayPosition: IndoorwayPosition): MutableMap.MutableEntry<IndoorwayNode, NodeInfo>? {
+        navigablePath?.entries?.forEach { entry: MutableMap.MutableEntry<IndoorwayNode, NodeInfo> ->
+            if (atNode(indoorwayPosition, entry.key)){
+                return entry
+            }
+        }
+        return null
     }
 }
