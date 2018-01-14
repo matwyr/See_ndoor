@@ -4,12 +4,9 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import com.indoorway.android.common.sdk.listeners.generic.Action0
 import com.indoorway.android.common.sdk.listeners.generic.Action1
-import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
-import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import android.speech.RecognizerIntent
-import com.indoorway.android.common.sdk.model.Coordinates
-import com.indoorway.android.common.sdk.model.IndoorwayNode
+import com.indoorway.android.common.sdk.model.*
 import eu.warble.voice.R
 import eu.warble.voice.data.VisitorDataSource
 import eu.warble.voice.data.VoiceService
@@ -39,10 +36,6 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                 }
             })
         }
-    }
-
-    fun tmp (){
-
     }
 
     /**
@@ -80,10 +73,14 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         val name = command?.substringAfter("find ")
         if (name != null)
             VisitorDataSource.findPerson(name, object : VisitorDataSource.OnPersonFindListener{
-                override fun found(position: IndoorwayPosition?) {
-                    if (position != null)
-                        startNavigating(position.coordinates)
-                    else
+                override fun found(visitorLocation: VisitorLocation?) {
+                    val coordinates = visitorLocation?.position?.coordinates
+                    val lastSeen = getString(R.string.person_last_seen_on) + " " +
+                            Tools.dateToString(visitorLocation?.timestamp)
+                    VoiceService.speak(lastSeen)
+                    if (coordinates != null) {
+                        startNavigating(coordinates)
+                    } else
                         VoiceService.speak(getString(R.string.person_currently_not_available))
                 }
                 override fun notFound() {
@@ -160,7 +157,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                         NavigationService.latestNonNullPosition.mapUuid)
     }
 
-    var latestSaid: MutableMap.MutableEntry<IndoorwayNode, NodeInfo>? = null
+    private var latestSaid: MutableMap.MutableEntry<IndoorwayNode, NodeInfo>? = null
     private fun onPositionChange(it: IndoorwayPosition) {
         NavigationService.latestNonNullPosition = it
         printCurrentPosition(it)
@@ -183,9 +180,9 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
 
     private fun getString(resId: Int): String {
         val context = navigationView.getMContext()
-        return if (context != null){
+        return if (context != null) {
             context.getString(resId)
-        }else{
+        } else {
             "null"
         }
     }

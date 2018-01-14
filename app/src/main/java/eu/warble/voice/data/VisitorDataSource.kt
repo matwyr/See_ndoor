@@ -2,7 +2,6 @@ package eu.warble.voice.data
 
 import com.indoorway.android.common.sdk.IndoorwaySdk
 import com.indoorway.android.common.sdk.listeners.generic.Action1
-import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.common.sdk.model.RegisteredVisitor
 import com.indoorway.android.common.sdk.model.VisitorLocation
 import com.indoorway.android.common.sdk.task.IndoorwayTask
@@ -19,7 +18,7 @@ object VisitorDataSource {
                     }
                     getLocationFor(visitor,
                             onLocationFound = Action1 {
-                                onPersonFindListener.found(it?.position)
+                                onPersonFindListener.found(it)
                             }, onFailedListener = Action1 { onPersonFindListener.notFound() })
                 }, onFailedListener = Action1 { onPersonFindListener.notFound() })
     }
@@ -50,7 +49,7 @@ object VisitorDataSource {
     }
 
     interface OnPersonFindListener{
-        fun found(position: IndoorwayPosition?)
+        fun found(visitorLocation: VisitorLocation?)
         fun notFound()
     }
 }

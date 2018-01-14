@@ -18,7 +18,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:focusableInTouchMode="true"
         android:clickable="true"
-        android:focusable="true" />
+        android:focusable="true"
+        android:hapticFeedbackEnabled="true"/>
 
     <FrameLayout
         android:id="@+id/loading_screen"

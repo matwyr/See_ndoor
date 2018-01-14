@@ -11,4 +11,5 @@
     <string name="error_map_load_failed">Map load failed</string>
     <string name="person_not_found">Person not found</string>
     <string name="person_currently_not_available">Person currently not available</string>
+    <string name="person_last_seen_on">Person last seen on</string>
 </resources>

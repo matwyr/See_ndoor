@@ -47,16 +47,14 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     }
 
     override fun activateLongClickListener(activate: Boolean) {
-        clickScreen.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         if (activate) {
-            clickScreen.isHapticFeedbackEnabled = true
             clickScreen.bringToFront()
             clickScreen.setOnLongClickListener {
                 presenter.recordVoice()
+                clickScreen.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 return@setOnLongClickListener true
             }
         }else {
-            clickScreen.isHapticFeedbackEnabled = true
             mapView.bringToFront()
             clickScreen.setOnLongClickListener(null)
         }

@@ -1,7 +1,7 @@
 package eu.warble.voice.util
 
-import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
+import java.text.SimpleDateFormat
 import java.util.*
 
 object Tools {
@@ -30,5 +30,10 @@ object Tools {
                 res = it
         }
         return res
+    }
+
+    fun dateToString(date: Date?): String {
+        if (date == null) return ""
+        return SimpleDateFormat("d MMMMMMM h:mm a", Locale.ENGLISH).format(date)
     }
 }
