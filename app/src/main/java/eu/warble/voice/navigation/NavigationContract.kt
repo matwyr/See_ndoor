@@ -23,6 +23,7 @@ interface NavigationContract {
         fun showError(error: String)
         fun activateLongClickListener(activate: Boolean)
         fun startActForResult(intent: Intent, requestCode: Int)
+        fun requestPermissions(permission: String, REQUEST_PERMISSION_CODE: Int)
     }
 
     interface Presenter: BasePresenter {

@@ -19,6 +19,10 @@ import eu.warble.voice.util.Tools
 class NavigationPresenter(val navigationView: NavigationContract.View)
     : NavigationContract.Presenter {
     private var mapIsLoaded: Boolean = false
+    
+    companion object {
+        val REQUEST_PERMISSION_CODE: Int = 234
+    }
 
     init {
         navigationView.presenter = this
@@ -158,6 +162,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     }
 
     private var latestSaid: MutableMap.MutableEntry<IndoorwayNode, NodeInfo>? = null
+
     private fun onPositionChange(it: IndoorwayPosition) {
         NavigationService.latestNonNullPosition = it
         printCurrentPosition(it)
@@ -189,8 +194,11 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
 
     private fun onStateError(error: IndoorwayLocationSdkError) {
         when(error) {
-            IndoorwayLocationSdkError.BleNotSupported -> { navigationView.showError("Bluetooth Low Energy is not supported") }
-            is IndoorwayLocationSdkError.MissingPermission -> { navigationView.showError("Some permissions are missing") }
+            IndoorwayLocationSdkError.BleNotSupported -> { VoiceService.speak(getString(R.string.your_device_is_not_supported)) }
+            is IndoorwayLocationSdkError.MissingPermission -> {
+                val permission = error.permission
+                navigationView.requestPermissions(permission, REQUEST_PERMISSION_CODE)
+            }
             IndoorwayLocationSdkError.BluetoothDisabled -> { navigationView.showError("Bluetooth is disabled") }
             IndoorwayLocationSdkError.LocationDisabled -> { navigationView.showError("Location is disabled") }
             IndoorwayLocationSdkError.UnableToFetchData -> { navigationView.showError("Network-related error, service will be restarted on network connection established") }

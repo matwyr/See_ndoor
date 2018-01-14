@@ -2,6 +2,7 @@ package eu.warble.voice.navigation
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.support.v4.app.Fragment
@@ -14,18 +15,12 @@ import com.indoorway.android.common.sdk.listeners.generic.Action1
 import com.indoorway.android.common.sdk.model.IndoorwayMap
 import eu.warble.voice.R
 import kotlinx.android.synthetic.main.navigation_fragment.*
-import java.util.*
-import android.content.ActivityNotFoundException
 import android.graphics.Color
-import android.net.Uri
 import android.view.HapticFeedbackConstants
-import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableCircle
-import com.indoorway.android.map.sdk.view.drawable.layers.Layer
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer
-import kotlinx.android.synthetic.main.loading_screen.*
 
 
 class NavigationFragment : Fragment(), NavigationContract.View {
@@ -122,6 +117,20 @@ class NavigationFragment : Fragment(), NavigationContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presenter.result(requestCode, resultCode, data)
+    }
+
+    override fun requestPermissions(permission: String, REQUEST_PERMISSION_CODE: Int) {
+        val arr = arrayOf(permission)
+        requestPermissions(arr, REQUEST_PERMISSION_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == NavigationPresenter.REQUEST_PERMISSION_CODE && grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            presenter.pause()
+            presenter.resume()
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     override fun onDestroy() {

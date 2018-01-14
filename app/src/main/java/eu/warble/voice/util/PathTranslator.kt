@@ -23,7 +23,7 @@ object PathTranslator {
             currentNode = nodeList[1]
             prevAngle = prevNode.coordinates.getAngleTo(currentNode.coordinates)
             milestoneNode = prevNode
-            var direction = Direction.STRAIGHT
+            var direction = Direction.LEFT
 
             while (iterator.hasNext()) {
                 currentNode = iterator.next()
