@@ -5,6 +5,8 @@ import com.indoorway.android.common.sdk.model.*
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkState
+import eu.warble.voice.data.model.Direction
+import eu.warble.voice.data.model.NodeInfo
 import eu.warble.voice.util.AStarSearch
 
 object NavigationService {
@@ -14,6 +16,8 @@ object NavigationService {
     lateinit var latestNonNullPosition: IndoorwayPosition
     lateinit var paths: List<IndoorwayNode>
     lateinit var mapObjects: List<IndoorwayObjectParameters>
+    var navigablePath: LinkedHashMap<IndoorwayNode, NodeInfo>? = null
+    var navIsRunning: Boolean = false
 
     val onMapLoadCompletedListener: Action1<IndoorwayMap> by lazy { Action1<IndoorwayMap> { onMapLoaded(it) } }
 
@@ -64,5 +68,29 @@ object NavigationService {
         return closestNode
     }
 
+    fun navigableNodeInfoToString(nodeInfo: NodeInfo): String{
+        return if (nodeInfo.direction != Direction.FINISH)
+            "In ${nodeInfo.distance.toInt()} metres turn ${nodeInfo.direction.name}"
+        else
+            "In ${nodeInfo.distance.toInt()} will be destination point"
+    }
+
+    fun navigableAtNodeInfoToString(nodeInfo: NodeInfo): String{
+        return if (nodeInfo.direction != Direction.FINISH)
+            "Turn ${nodeInfo.direction.name}"
+        else
+            "Finish point"
+    }
+
     private fun latestPosition(): IndoorwayPosition? = IndoorwayLocationSdk.instance().position().latest()
+
+    fun atNode(it: IndoorwayPosition): Boolean {
+        val node = navigablePath?.iterator()?.next()
+        if (node != null){
+            if (it.coordinates.getDistanceTo(node.key.coordinates) <= 2){
+                return true
+            }
+        }
+        return false
+    }
 }

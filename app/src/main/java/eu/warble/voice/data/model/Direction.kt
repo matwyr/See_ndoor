@@ -2,7 +2,6 @@ package eu.warble.voice.data.model
 
 
 enum class Direction {
-    LEFT, RIGHT, STRAIGHT, FINISH
-
+    LEFT, RIGHT, FINISH, STRAIGHT
 
 }

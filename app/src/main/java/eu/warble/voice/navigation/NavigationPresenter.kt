@@ -11,7 +11,10 @@ import android.speech.RecognizerIntent
 import com.indoorway.android.common.sdk.model.IndoorwayNode
 import eu.warble.voice.R
 import eu.warble.voice.data.VoiceService
+import eu.warble.voice.data.model.Direction
+import eu.warble.voice.util.PathTranslator
 import eu.warble.voice.util.Tools
+import kotlin.concurrent.fixedRateTimer
 
 
 class NavigationPresenter(val navigationView: NavigationContract.View)
@@ -56,7 +59,7 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                     if (command.startsWith("go")) {
                         val obj = Tools.checkObjectAvailable(command, NavigationService.mapObjects)
                         if (obj != null)
-                            navigate(obj)
+                            startNavigating(obj)
                         else
                             VoiceService.speak(getString(R.string.room_is_not_existing))
                     }else if (command.startsWith("find")){
@@ -67,13 +70,20 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         }
     }
 
-    private fun navigate(obj: IndoorwayObjectParameters) {
+    private fun startNavigating(obj: IndoorwayObjectParameters) {
         val path = NavigationService.findPath(obj)
         printPathAtMap(path)
+        NavigationService.navigablePath = PathTranslator.translate(path)
+        NavigationService.navIsRunning = true
+        val node = NavigationService.navigablePath?.iterator()?.next()
+        if (node != null) {
+            VoiceService.speak(NavigationService.navigableNodeInfoToString(node.value))
+        }
     }
 
     private fun stopNavigation() {
         navigationView.printPathAtMap(null)
+        //TODO
 
     }
 
@@ -130,6 +140,16 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     private fun onPositionChange(it: IndoorwayPosition) {
         NavigationService.latestNonNullPosition = it
         printCurrentPosition(it)
+        if (NavigationService.navIsRunning && NavigationService.atNode(it)){
+            val node = NavigationService.navigablePath?.iterator()?.next()
+            if (node != null) {
+                VoiceService.speak(NavigationService.navigableAtNodeInfoToString(node.value))
+                NavigationService.navigablePath?.remove(node.key)
+                if (node.value.direction == Direction.FINISH) {
+                    stopNavigation()
+                }
+            }
+        }
     }
 
     override fun destroy() {

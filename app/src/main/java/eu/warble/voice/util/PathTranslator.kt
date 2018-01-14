@@ -8,9 +8,7 @@ import eu.warble.voice.data.model.NodeInfo
 
 
 //                      ******        PathTranslator.translate(nodelist)           *******
-class PathTranslator {
-
-    companion object Translator {
+object PathTranslator {
 
         fun translate(nodelist: List<IndoorwayNode>): LinkedHashMap<IndoorwayNode, NodeInfo> {
             val hmap = LinkedHashMap<IndoorwayNode, NodeInfo>()
@@ -34,7 +32,7 @@ class PathTranslator {
 
                 milestoneNode = prevNode
 
-                var direction=Direction.STRAIGHT
+                var direction = Direction.STRAIGHT
 
                 while (iterator.hasNext()) {
                     currentNode = iterator.next()
@@ -81,7 +79,7 @@ class PathTranslator {
 
             var ret = ""
 
-            for ((key, value) in hmap) {
+            for ((_, value) in hmap) {
                 ret += "$value" + "\n"
             }
 
@@ -89,5 +87,4 @@ class PathTranslator {
 
             return hmap
         }
-    }
 }
