@@ -13,7 +13,6 @@ interface NavigationContract {
 
     interface View: BaseView<Presenter>{
         fun getMContext(): Context?
-        fun mString(resId: Int): String
         fun showLoading(show: Boolean)
         fun showMap(show: Boolean)
         fun printPathAtMap(dots: List<IndoorwayNode>?)
@@ -23,16 +22,15 @@ interface NavigationContract {
                     onMapLoadFailedListener: Action0)
         fun showError(error: String)
         fun activateLongClickListener(activate: Boolean)
-        fun recordVoice()
+        fun startActForResult(intent: Intent, requestCode: Int)
     }
 
     interface Presenter: BasePresenter {
         fun pause()
         fun resume()
         fun result(requestCode: Int, resultCode: Int, data: Intent?)
-        fun recordVoice()
-        fun saySomething(toSay: String)
-        fun parseVoice(said: String?)
+        fun parseVoiceCommand(said: String?)
         fun destroy()
+        fun recordVoice()
     }
 }

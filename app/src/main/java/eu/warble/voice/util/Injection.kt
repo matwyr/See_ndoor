@@ -1,7 +1,7 @@
 package eu.warble.voice.util
 
-import eu.warble.voice.data.VoiceRepository
+import eu.warble.voice.data.VoiceService
 
 object Injection {
-    fun provideVoiceRepository(): VoiceRepository = VoiceRepository()
+    fun provideVoiceRepository(): VoiceService = VoiceService()
 }

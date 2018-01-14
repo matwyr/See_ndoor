@@ -28,11 +28,12 @@ import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer
 
 class NavigationFragment : Fragment(), NavigationContract.View {
     override lateinit var presenter: NavigationContract.Presenter
+
     val pathLayer: MarkersLayer by lazy { mapView.marker.addLayer(9f) }
     var lastPaths: List<IndoorwayNode>? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.navigation_fragment, container, false)
+        presenter.start()
         return view
     }
 
@@ -55,6 +56,10 @@ class NavigationFragment : Fragment(), NavigationContract.View {
             mapView.bringToFront()
             clickScreen.setOnLongClickListener(null)
         }
+    }
+
+    override fun startActForResult(intent: Intent, requestCode: Int) {
+        startActivityForResult(intent, requestCode)
     }
 
     override fun printPathAtMap(dots: List<IndoorwayNode>?) {
@@ -96,30 +101,8 @@ class NavigationFragment : Fragment(), NavigationContract.View {
         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
     }
 
-    override fun mString(resId: Int): String {
-        return getString(resId)
-    }
-
-    override fun recordVoice() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US)
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt))
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
-        } catch (a: ActivityNotFoundException) {
-            val appPackageName = "com.google.android.googlequicksearchbox"
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)))
-            } catch (anfe: android.content.ActivityNotFoundException) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)))
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        presenter.start()
         presenter.resume()
     }
 

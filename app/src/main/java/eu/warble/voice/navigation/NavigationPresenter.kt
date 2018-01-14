@@ -8,18 +8,14 @@ import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters
 import com.indoorway.android.common.sdk.model.IndoorwayPosition
 import com.indoorway.android.location.sdk.model.IndoorwayLocationSdkError
 import android.speech.RecognizerIntent
-import android.speech.tts.TextToSpeech
-import com.indoorway.android.common.sdk.model.Coordinates
 import com.indoorway.android.common.sdk.model.IndoorwayNode
-import eu.warble.voice.util.AStarSearch
+import eu.warble.voice.R
+import eu.warble.voice.data.VoiceService
 import eu.warble.voice.util.Tools
-import java.util.*
 
 
 class NavigationPresenter(val navigationView: NavigationContract.View)
     : NavigationContract.Presenter {
-
-    lateinit var textToSpeech: TextToSpeech
     private var mapIsLoaded: Boolean = false
 
     init {
@@ -27,39 +23,41 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     }
 
     override fun start() {
-        textToSpeech = TextToSpeech(navigationView.getMContext(), { status: Int ->
-            if (status == TextToSpeech.SUCCESS) {
-                val res = textToSpeech.setLanguage(Locale.US)
-                if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED)
-                    navigationView.showError("US Language is not supported")
-            }else
-                navigationView.showError("TTS Initialization Failed!")
-        })
-        saySomething("Determining location")
+        val context = navigationView.getMContext()
+        if (context != null) {
+            VoiceService.start(context, object : VoiceService.VoiceServiceCallback{
+                override fun onStarted() {
+                    VoiceService.speak(context.getString(R.string.determining_location))
+                }
+                override fun onError(error: String) {
+                    navigationView.showError(error)
+                }
+            })
+        }
     }
 
     /**
      * Result will be on result method
      */
     override fun recordVoice() {
-        navigationView.recordVoice()
+        val context = navigationView.getMContext()
+        if (context != null)
+            VoiceService.recordVoice(context, startActivityForResult = {
+                intent, requestCode ->  navigationView.startActForResult(intent, requestCode)
+        })
     }
 
-    override fun saySomething(toSay: String) {
-        textToSpeech.speak(toSay, TextToSpeech.QUEUE_ADD, null, null)
-    }
-
-    override fun parseVoice(said: String?) {
+    override fun parseVoiceCommand(said: String?) {
         if (said != null) {
             when(said){
                 "stop" -> stopNavigation()
-                "repeat" -> saySomething("Please repeat")
+                "repeat" -> VoiceService.speak(getString(R.string.please_repeat))
                 else -> {
                     val obj = Tools.checkObjectAvailable(said, NavigationService.mapObjects)
                     if(obj != null)
                         navigate(obj)
                     else
-                        saySomething("Room is not existing")
+                        VoiceService.speak(getString(R.string.room_is_not_existing))
                 }
             }
         }
@@ -75,20 +73,20 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
 
     }
 
-    fun printPathAtMap(dots: List<IndoorwayNode>?){
+    private fun printPathAtMap(dots: List<IndoorwayNode>?){
         navigationView.printPathAtMap(dots)
     }
 
-    fun printCurrentPosition(position: IndoorwayPosition){
+    private fun printCurrentPosition(position: IndoorwayPosition){
         navigationView.printCurrentPosition(position)
     }
 
     override fun result(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == NavigationFragment.REQ_CODE_SPEECH_INPUT && resultCode == RESULT_OK && data != null){
             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            saySomething(result[0])
+            VoiceService.speak(result[0])
             val command = Tools.recogniseCommand(result[0])
-            parseVoice(command)
+            parseVoiceCommand(command)
         }
     }
 
@@ -100,9 +98,9 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
                     navigationView.showLoading(false)
                     navigationView.showMap(true)
                     mapIsLoaded = true
-                    saySomething("If you want to find room, press the screen and just say go, and room number")
+                    VoiceService.speak(getString(R.string.init_tip))
                 }, onMapLoadFailedListener = Action0 {
-                    navigationView.showError("MapLoadFailed")
+                    navigationView.showError(getString(R.string.error_map_load_failed))
                 }
         )
     }
@@ -115,11 +113,11 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
         NavigationService.start(
                 positionChangeListener = Action1 { onPositionChange(it) } ,
                 stateErrorListener = Action1 {onStateError(it)},
-                onStartListener = Action1 { onLocationDetermined(it) }
+                onStartListener = Action1 { onLocationDetermined() }
         )
     }
 
-    private fun onLocationDetermined(position: IndoorwayPosition?){
+    private fun onLocationDetermined(){
         if (!mapIsLoaded)
             loadMapView(NavigationService.latestNonNullPosition.buildingUuid,
                         NavigationService.latestNonNullPosition.mapUuid)
@@ -131,8 +129,16 @@ class NavigationPresenter(val navigationView: NavigationContract.View)
     }
 
     override fun destroy() {
-        textToSpeech.stop()
-        textToSpeech.shutdown()
+        VoiceService.stop()
+    }
+
+    private fun getString(resId: Int): String {
+        val context = navigationView.getMContext()
+        return if (context != null){
+            context.getString(resId)
+        }else{
+            "null"
+        }
     }
 
     private fun onStateError(error: IndoorwayLocationSdkError) {
